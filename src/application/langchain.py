@@ -3,7 +3,7 @@ from langchain_openai import AzureChatOpenAI
 import os
 from dotenv import dotenv_values
 from langchain.memory import ConversationBufferMemory
-from db_functions import ConversationStore
+from db_functions import ConversationStore, CosmosDBHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
 config=dotenv_values("D:\GenAI\Projects\ChatApp\.env")
@@ -41,12 +41,10 @@ class Conversation():
     
     # Get the conversation history given session_id
 
-
-
-
-        
-
-    
-    
-
-
+    def get_conversation_history(self,session_id: str) -> dict:
+        if session_id in self.history:
+            return self.history[session_id].messages
+        else:
+            history=CosmosDBHistory(session_id, self.store)
+            self.history[session_id]=history
+            return history.messages
