@@ -5,11 +5,14 @@ from dotenv import dotenv_values
 from src.application.db_functions import ConversationStore, CosmosDBHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.messages import BaseMessage
+from langchain_core.messages.ai import AIMessage
+from typing import Dict
 config=dotenv_values("D:\GenAI\Projects\ChatApp\.env")
 AZURE_OPENAI_KEY=config["AZURE_OPENAI_KEY"]
 AZURE_ENDPOINT=config["AZURE_OPENAI_ENDPOINT"]
 AZURE_OPENAI_VERSION=config["AZURE_OPENAI_VERSION"]
 AZURE_OPENAI_DEPLOYMENT=config["OPENAI_DEPLOYMENT_NAME"]
+
 
 
 # Code for Conversation
@@ -38,13 +41,20 @@ class Conversation():
         self.conversation=RunnableWithMessageHistory(chain,get_session_history,input_messages_key="input",history_messages_key="history")
         
     def get_response(self, input: str, session_id:str):
-        print("runnable started")
+        print(f"Getting response for input: '{input}' and session_id: {session_id}")
         try:
             self.response=self.conversation.invoke({"input":input}, config={"configurable":{"session_id":session_id}})
-            print(f"LLM response:{self.response}")
-            return self.response
+            print(f"RAW LLM response:{self.response}")
+            if isinstance(self.response, AIMessage):
+                return self.response.content
+            elif isinstance(self.response, Dict) and 'content' in self.response:
+                return self.response['content']
+            else:
+                print(f"Unexpected response format: {type(self.response)}")
+                return str(self.response)
         except Exception as e:
             print(f"Error in get_response: {e}")
+            return f"An error occurred: {str(e)}"
     
     # Get the conversation history given session_id
     def get_conversation_history(self,session_id: str) -> list[BaseMessage]:

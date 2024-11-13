@@ -37,7 +37,7 @@ class ConversationStore():
         if self.conversation:
             return self.conversation[0]
         else:
-            None
+            return None
 
 
 class CosmosDBHistory(BaseChatMessageHistory):
@@ -56,8 +56,9 @@ class CosmosDBHistory(BaseChatMessageHistory):
             for msg in conversation['conversation']]
         print("load messages completed")
     
-    def add_message(self, message: List[BaseMessage]) -> None:
+    def add_message(self, message: BaseMessage) -> None:
         self._messages.append(message)
+        print(f"Adding message: {message.type} - {message.content}")
         self.store.store_conversation(self.session_id, self._messages)
 
     def clear(self) -> None:
