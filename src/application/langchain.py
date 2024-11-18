@@ -32,28 +32,30 @@ class Conversation():
         
         def get_session_history(session_id: str):
             if session_id not in self.history:
-                print("CosmosDB Started")
                 self.history[session_id]= CosmosDBHistory(session_id,self.store)
-                print("CosmosDB Scompleted")
-                print(f"Current history for session {session_id}:", self.history[session_id].messages)
             return self.history[session_id]
-        
         self.conversation=RunnableWithMessageHistory(chain,get_session_history,input_messages_key="input",history_messages_key="history")
         
     def get_response(self, input: str, session_id:str):
         print(f"Getting response for input: '{input}' and session_id: {session_id}")
         try:
             self.response=self.conversation.invoke({"input":input}, config={"configurable":{"session_id":session_id}})
-            print(f"RAW LLM response:{self.response}")
-            if isinstance(self.response, AIMessage):
+            print(f"Raw response: {self.response}")
+            if isinstance(self.response, str):
+                return self.response
+            elif isinstance(self.response, AIMessage):
                 return self.response.content
-            elif isinstance(self.response, Dict) and 'content' in self.response:
-                return self.response['content']
+            elif isinstance(self.response, dict):
+                if 'content' in self.response:
+                    return self.response['content']
+                elif isinstance(self.response.get('response'), str):
+                    return self.response['response']
+                else:
+                    return str(self.response)
             else:
                 print(f"Unexpected response format: {type(self.response)}")
                 return str(self.response)
         except Exception as e:
-            print(f"Error in get_response: {e}")
             return f"An error occurred: {str(e)}"
     
     # Get the conversation history given session_id
@@ -63,4 +65,4 @@ class Conversation():
         else:
             history=CosmosDBHistory(session_id, self.store)
             self.history[session_id]=history
-            return history.messages
+            return self.history[session_id].messages

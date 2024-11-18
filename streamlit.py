@@ -47,6 +47,7 @@ if prompt:
 
     try:
         response=conversation.get_response(session_id=st.session_state.session_id,input=prompt)
+        print(f"Response from get_response: {response}")  # Add this line for debugging
         if response:
             with st.chat_message("Assistant"):
                 st.write(response)
@@ -56,12 +57,14 @@ if prompt:
             st.error("No response received from the assistant.")
     except Exception as e:
         st.error(f"1st Error Getting Response: {str(e)}")
+        print(f"Detailed error: {type(e).__name__}, {str(e)}")
 
 button=st.button("End conversation")
 if button:
     try:
         conversation_history=conversation.get_conversation_history(session_id=st.session_state.session_id)
         #Store Conversation
+
         conversation_store.store_conversation(session_id=st.session_state.session_id,conversation_history=conversation_history)
         st.success("Conversation stored successfully")
         st.session_state.messages = []
@@ -69,6 +72,8 @@ if button:
         st.rerun()
     except Exception as e:
         st.error(f"Error Getting response: {str(e)}")
+        print(f"Detailed error: {type(e).__name__}, {str(e)}")
+
 
 # write conversation on sidebar
 st.sidebar.write(f"Current Session ID: {st.session_state.session_id}")
