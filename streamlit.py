@@ -47,7 +47,6 @@ if prompt:
 
     try:
         response=conversation.get_response(session_id=st.session_state.session_id,input=prompt)
-        print(f"Response from get_response: {response}")  # Add this line for debugging
         if response:
             with st.chat_message("Assistant"):
                 st.write(response)
