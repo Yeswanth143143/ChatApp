@@ -17,19 +17,24 @@ st.set_page_config(page_title="Chat application")
 st.title("Hey Lets Chat")
 
 # Option to load a previous conversation
-load_session_id = st.sidebar.text_input("Enter Session ID to load:")
-if st.sidebar.button("Load Conversation"):
+st.sidebar.title("Previous Conversations")
+loaded_conversations = conversation_store.get_all_conversations()
+if loaded_conversations:
     try:
-        loaded_conversation = conversation_store.get_conversation(load_session_id)
-        if loaded_conversation:
-            st.session_state.messages = [
-                {"role": msg["role"], "content": msg["content"]}
-                for msg in loaded_conversation['conversation']
-            ]
-            st.session_state.session_id = load_session_id
-            st.sidebar.success("Conversation loaded successfully!")
-        else:
-            st.sidebar.error("No conversation found for the given Session ID.")
+        for each_conversation in loaded_conversations:
+            for session_id,conversation_list in each_conversation.items():
+                    if conversation_list:
+                        first_message= conversation_list[0]['content']
+                        load_history=st.sidebar.button(f"{first_message}",key=session_id)
+                        if load_history:
+                            st.session_state.messages = [
+                                {"role": msg["role"], "content": msg["content"]}
+                                for msg in conversation_list
+                            ]
+                            st.session_state.session_id = session_id
+                            st.sidebar.success("Conversation loaded successfully!")
+                    else:
+                        st.sidebar.error("No conversation found for the given Session ID.")
     except Exception as e:
         st.sidebar.error(f"Error loading conversation: {str(e)}")
 
@@ -72,7 +77,3 @@ if button:
     except Exception as e:
         st.error(f"Error Getting response: {str(e)}")
         print(f"Detailed error: {type(e).__name__}, {str(e)}")
-
-
-# write conversation on sidebar
-st.sidebar.write(f"Current Session ID: {st.session_state.session_id}")

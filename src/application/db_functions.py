@@ -54,6 +54,13 @@ class ConversationStore():
             return self.conversation[0]
         else:
             return None
+        
+    def get_all_conversations(self):
+        query="SELECT c.session_id,c.conversation FROM c ORDER BY c.timestamp DESC"
+        self.items=self.container.query_items(query=query,enable_cross_partition_query=True)
+        conversations=list(self.items)
+        self.conversations=[{conversation["session_id"]: conversation['conversation']} for conversation in conversations]
+        return self.conversations
 
 
 class CosmosDBHistory(BaseChatMessageHistory):
