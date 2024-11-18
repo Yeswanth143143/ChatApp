@@ -35,7 +35,7 @@ class ConversationStore():
         print(f"Conversation retrieved successfully for session_id: {session_id}")
         print(self.conversation)
         if self.conversation:
-            return self.conversation[0]
+            return self.conversation
         else:
             return None
 
