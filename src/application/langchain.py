@@ -37,10 +37,8 @@ class Conversation():
         self.conversation=RunnableWithMessageHistory(chain,get_session_history,input_messages_key="input",history_messages_key="history")
         
     def get_response(self, input: str, session_id:str):
-        print(f"Getting response for input: '{input}' and session_id: {session_id}")
         try:
             self.response=self.conversation.invoke({"input":input}, config={"configurable":{"session_id":session_id}})
-            print(f"Raw response: {self.response.content}")
             if isinstance(self.response, str):
                 return self.response
             elif isinstance(self.response, AIMessage):
@@ -53,7 +51,6 @@ class Conversation():
                 else:
                     return str(self.response)
             else:
-                print(f"Unexpected response format: {type(self.response)}")
                 return str(self.response)
         except Exception as e:
             return f"An error occurred: {str(e)}"
@@ -61,10 +58,8 @@ class Conversation():
     # Get the conversation history given session_id
     def get_conversation_history(self,session_id: str) -> list[BaseMessage]:
         if session_id in self.history:
-            print("conversation history from Session:",self.history[session_id].messages)
             return self.history[session_id].messages
         else:
             history=CosmosDBHistory(session_id, self.store)
             self.history[session_id]=history
-            print("conversation history FRom DB:",self.history[session_id].messages)
             return self.history[session_id].messages

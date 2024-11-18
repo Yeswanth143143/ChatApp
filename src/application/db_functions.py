@@ -25,14 +25,13 @@ class ConversationStore():
         parameters=[{'name': '@session_id', 'value': session_id}],
         enable_cross_partition_query=True
         ))  
-        print("Existing Item:",existing_items)
+
         if existing_items:
             # Update existing document
             existing_item = existing_items[0]
             existing_item['conversation'] = [{"role": msg.type, "content": msg.content} for msg in conversation_history]
             existing_item['timestamp'] = timestamp
             self.container.replace_item(item=existing_item, body=existing_item)
-            print("converstaion added to existing item:",existing_item)
         else:
             # Create new document
             conversation = {
@@ -42,13 +41,11 @@ class ConversationStore():
                 "timestamp": timestamp
             }
             self.container.create_item(body=conversation)
-            print("conversation stored to new document:",conversation)
 
     def get_conversation(self,session_id: str) -> Dict:
         query="SELECT * FROM c WHERE c.session_id = @session_id ORDER BY c.timestamp DESC OFFSET 0 LIMIT 1"
         #Check what container returns
         self.items=self.container.query_items(query=query,parameters=[{'name':'@session_id',"value":session_id}],enable_cross_partition_query=True)
-        print("Item:",self.items)
         self.conversation=list(self.items)
         if self.conversation:
             return self.conversation[0]
@@ -76,7 +73,7 @@ class CosmosDBHistory(BaseChatMessageHistory):
             self._messages = [
             HumanMessage(content=msg['content']) if msg['role'] == 'human' else AIMessage(content=msg['content'])
              for msg in conversations['conversation']]
-            print("Messages Loaded to history list.")
+    
     
     def add_message(self, message: BaseMessage) -> None:
         self._messages.append(message)

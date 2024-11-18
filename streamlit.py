@@ -68,7 +68,6 @@ if button:
     try:
         conversation_history=conversation.get_conversation_history(session_id=st.session_state.session_id)
         #Store Conversation
-
         conversation_store.store_conversation(session_id=st.session_state.session_id,conversation_history=conversation_history)
         st.success("Conversation stored successfully")
         st.session_state.messages = []
