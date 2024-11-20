@@ -7,3 +7,5 @@ langchain-openai
 langchain-community
 azure-cosmos
 azure-identity
+azure-search-documents
+azure-core

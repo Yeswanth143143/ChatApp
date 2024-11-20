@@ -7,3 +7,5 @@ Chat_Application.egg-info/requires.txt
 Chat_Application.egg-info/top_level.txt
 src/__init__.py
 src/application/__init__.py
+src/application/db_functions.py
+src/application/langchain.py

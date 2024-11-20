@@ -5,6 +5,7 @@ setup(
     author="Yeswanth Chowdary",
     version="0.0.1",
     author_email="bgotti@hawk.iit.edu",
-    install_requires=["openai","langchain","streamlit","python_dotenv","PyPDF2","langchain-openai","langchain-community", "azure-cosmos","azure-identity"],
+    install_requires=["openai","langchain","streamlit","python_dotenv","PyPDF2","langchain-openai","langchain-community", "azure-cosmos","azure-identity","azure-search-documents",
+                      "azure-core"],
     packages=find_packages()
 )
